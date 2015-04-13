@@ -50,7 +50,7 @@ pub fn panic(expr_file_line: &(&'static str, &'static str, u32)) -> ! {
 #[cfg(feature = "trivial_panic")]
 #[lang="panic"]
 pub fn panic(_expr_file_line: &(&'static str, &'static str, u32)) -> ! {
-    loop { };
+    unsafe { ::core::intrinsics::abort(); }
 }
 
 #[cold] #[inline(never)]
@@ -67,10 +67,11 @@ fn panic_bounds_check(file_line: &(&'static str, u32),
 #[lang="panic_bounds_check"]
 fn panic_bounds_check(_file_line: &(&'static str, u32),
                      _index: usize, _len: usize) -> ! {
-    loop { };
+    unsafe { ::core::intrinsics::abort(); }
 }
 
 #[cold] #[inline(never)]
+#[cfg(not(feature = "trivial_panic"))]
 pub fn panic_fmt(fmt: fmt::Arguments, file_line: &(&'static str, u32)) -> ! {
     #[allow(improper_ctypes)]
     extern {
@@ -79,4 +80,10 @@ pub fn panic_fmt(fmt: fmt::Arguments, file_line: &(&'static str, u32)) -> ! {
     }
     let (file, line) = *file_line;
     unsafe { panic_impl(fmt, file, line) }
+}
+
+#[cold] #[inline(never)]
+#[cfg(feature = "trivial_panic")]
+pub fn panic_fmt(fmt: fmt::Arguments, file_line: &(&'static str, u32)) -> ! {
+    unsafe { ::core::intrinsics::abort(); }
 }
