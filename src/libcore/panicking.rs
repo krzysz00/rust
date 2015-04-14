@@ -46,7 +46,7 @@ pub fn panic(expr_file_line: &(&'static str, &'static str, u32)) -> ! {
     panic_fmt(fmt::Arguments::new_v1(&[expr], &[]), &(file, line))
 }
 
-#[cold] #[inline(never)] // this is the slow path, always
+#[inline(always)] // this is the slow path, always
 #[cfg(feature = "trivial_panic")]
 #[lang="panic"]
 pub fn panic(_expr_file_line: &(&'static str, &'static str, u32)) -> ! {
@@ -62,7 +62,7 @@ fn panic_bounds_check(file_line: &(&'static str, u32),
                            len, index), file_line)
 }
 
-#[cold] #[inline(never)]
+#[inline(always)]
 #[cfg(feature = "trivial_panic")]
 #[lang="panic_bounds_check"]
 fn panic_bounds_check(_file_line: &(&'static str, u32),
