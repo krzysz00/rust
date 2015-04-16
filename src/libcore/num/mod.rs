@@ -1261,7 +1261,12 @@ macro_rules! int_impl {
         #[stable(feature = "rust1", since = "1.0.0")]
         #[inline]
         pub fn abs(self) -> $T {
-            if self.is_negative() { -self } else { self }
+            if self.is_negative() {
+                // FIXME (#24420) use wrapping_neg instead after it lands.
+                (!self).wrapping_add(1)
+            } else {
+                self
+            }
         }
 
         /// Returns a number representing sign of `self`.
